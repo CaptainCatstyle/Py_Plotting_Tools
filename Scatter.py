@@ -21,7 +21,7 @@ FilePath = None
 
 
 """Basic plot parameter initialization"""
-plt.style.use(['science', 'notebook', 'grid', 'no-latex'])
+plt.style.use(['science', 'notebook', 'grid'])
 
 rows = 1
 columns = 1
@@ -79,12 +79,13 @@ if FilePath is not None:
 elif x is None and y is None:
     ReadClipboard()
 
-#m, b = np.polyfit(x,y, deg=1)
-#print(m,b)
-#ax.plot(x_fit, y_fit, 'r-', label=f"Fit: y = {slope:.4f}x + {intercept:.4f}")
+
+"""Data Plotting"""
+ax.errorbar(x, y, xerr=xError, yerr=yError, marker=marker, color=color, capsize=capsize, label=legendLabel)
+ax.legend(loc=legendLocation, fancybox=False, edgecolor='black')
 
 
-
+"""Calculation and plotting of the linear regression"""
 slope, intercept, r_value, p_value, std_err_slope = linregress(x, y)
 x_fit = np.linspace(min(x), max(x), 100)
 y_fit = slope * x_fit + intercept
@@ -95,15 +96,34 @@ std_err_intercept = std_err_slope * np.sqrt(1 / len(x) + (x_mean ** 2 / sum_x_de
 
 
 confidence_interval = 1.96 * std_err_slope * x_fit
-ax.plot(x_fit, y_fit, 'r-', label=f"Fit: y = ({slope:.2f} ± {std_err_slope:.2f})x + ({intercept:.2f} ± {std_err_intercept:.2f})")
-ax.fill_between(x_fit, y_fit - confidence_interval, y_fit + confidence_interval, 
-                color='red', alpha=0.2, label="Regression 95% CI")
+ax.plot(x_fit, y_fit, 'r-', label=f"Fit: y = ({slope:.2f} $\pm$ {std_err_slope:.2f})x + ({intercept:.2f} ± {std_err_intercept:.2f})")
+
+
+"""Template for a multiple plot figure
+ReadCsvFile()
+df = None 
+x = None 
+xError = None 
+y = None
+yError = None
+
+ax.set_xlabel('X-Axis')
+ax.set_ylabel('Y-Axis')
+ax.set_title('Title')
+marker = 'o'
+linestyle = '-'
+color = 'black'
+capsize = 5 
+legendLabel = 'Dataset'
+legendLocation='upper left'
 
 
 
 
 
 
-ax.errorbar(x, y, xerr=xError, yerr=yError, marker=marker, color=color, capsize=capsize, label=legendLabel)
-ax.legend(loc=legendLocation, fancybox=False, edgecolor='black')
+
+
+
+"""
 
