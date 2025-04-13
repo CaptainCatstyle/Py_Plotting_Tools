@@ -63,7 +63,7 @@ def read_csv_file(FilePath):
         print(f"Error reading CSV file: {e}")
 
 
-def plot_errorbars(x, xError, y, yError, xlabel='X-Axis', ylabel='Y-Axis', title='Title', legend='', marker='o', linestyle='', color='black', capsize=5, regression=True, rlabel=''):
+def plot_errorbars(x, xError, y, yError, xlabel='X-Axis', ylabel='Y-Axis', title='Title', legend='', marker='o', linestyle='', color='black', capsize=5):
     plt.xlabel(xlabel)
     plt.ylabel(ylabel)
     plt.title(title)
@@ -71,20 +71,21 @@ def plot_errorbars(x, xError, y, yError, xlabel='X-Axis', ylabel='Y-Axis', title
     plt.errorbar(x, y, xerr=xError, yerr=yError, marker=marker, linestyle=linestyle, color=color, capsize=capsize,
                 label=legend)
 
-    if regression == True:
-        slope, intercept, r_value, p_value, std_err_slope = linregress(x, y)
-        x_fit = np.linspace(min(x), max(x), 100)
-        y_fit = slope * x_fit + intercept
+def plot_regression(x, y,):
+    slope, intercept, r_value, p_value, std_err_slope = linregress(x, y)
+    x_fit = np.linspace(min(x), max(x), 100)
+    y_fit = slope * x_fit + intercept
 
-        n = len(x)
-        x_mean = np.mean(x)
-        y_pred = slope * x + intercept
-        residuals = y - y_pred
-        s_e = np.sqrt(np.sum(residuals ** 2) / (n - 2))  # std error of regression
-        sum_x_deviation_squared = np.sum((x - x_mean) ** 2)
-        std_err_intercept = s_e * np.sqrt(1 / n + (x_mean ** 2 / sum_x_deviation_squared))
+    n = len(x)
+    x_mean = np.mean(x)
+    y_pred = slope * x + intercept
+    residuals = y - y_pred
+    s_e = np.sqrt(np.sum(residuals ** 2) / (n - 2))  # std error of regression
+    sum_x_deviation_squared = np.sum((x - x_mean) ** 2)
+    std_err_intercept = s_e * np.sqrt(1 / n + (x_mean ** 2 / sum_x_deviation_squared))
 
-        plt.plot(x_fit, y_fit, label = f"y = ({slope:.2f} $\\pm$ {std_err_slope:.2f})x + ({intercept:.2f} $\\pm$ {std_err_intercept:.2f})")
+    plt.plot(x_fit, y_fit)
+    return slope, std_err_slope, intercept, std_err_intercept
 
 
 
