@@ -1,7 +1,4 @@
-import pandas as pd
 import matplotlib.pyplot as plt
-import numpy as np
-from scipy.stats import linregress
 import scienceplots
 import scatter as sc
 
@@ -23,7 +20,6 @@ else:
     ax = axes[0][0]
     plt.sca(ax)
 
-plt.sca(ax)
 x ,xError, y, yError = sc.read_clipboard()
 sc.plot_errorbars(x, xError, y, yError, 'X Values', 'Y Values', 'Test Plot')
 slope, std_err_slope, intercept, std_err_intercept = sc.plot_regression(x, y)
