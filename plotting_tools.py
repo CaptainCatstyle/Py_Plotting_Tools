@@ -70,23 +70,15 @@ def linear_regression(x, y):
 
     :author: Baran Duendar
     """
-    slope, intercept, r_value, p_value, std_err_slope = linregress(x, y)
+    res = linregress(x, y)
     x_fit = np.linspace(min(x), max(x), 100)
-    y_fit = slope * x_fit + intercept
+    y_fit = res.slope * x_fit + res.intercept
 
-    n = len(x)
-    x_mean = np.mean(x)
-    y_pred = slope * x + intercept
-    residuals = y - y_pred
-    s_e = np.sqrt(np.sum(residuals ** 2) / (n - 2))  # std error of regression
-    sum_x_deviation_squared = np.sum((x - x_mean) ** 2)
-    std_err_intercept = s_e * np.sqrt(1 / n + (x_mean ** 2 / sum_x_deviation_squared))
-
-    print('Slope:', slope)
-    print('Delta Slope:', std_err_slope)
-    print('Intercept:', intercept)
-    print('Delta Intercept:', std_err_intercept)
-    return x_fit, y_fit, slope, std_err_slope, intercept, std_err_intercept
+    print('Slope:', res.slope)
+    print('Delta Slope:', res.stderr)
+    print('Intercept:', res.intercept)
+    print('Delta Intercept:', res.intercept_stderr)
+    return x_fit, y_fit, res.slope, res.stderr, res.intercept, res.intercept_stderr
 
 
 def round_din1333(value: float, uncertainty: float):
