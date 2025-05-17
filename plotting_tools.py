@@ -7,7 +7,7 @@ def read_clipboard():
     """
     :brief: Reads users clipboard data to get needed plot data
 
-    :return (np.Array): x, Delta x, y, Delta y
+    :return: (np.Array) x, Delta x, (np.Array) y, Delta y
 
     :author: Baran Duendar
     """
@@ -34,9 +34,9 @@ def read_csv_file(FilePath):
     """
     :brief: Reads csv or txt file to extract plot data
 
-    :param FilePath (String): Filepath to the Csv or txt file. Recommended is the Input as a raw String
+    :param FilePath: (String) Filepath to the Csv or txt file. Recommended is the Input as a raw String
 
-    :return (np.Array): x, Delta x, y, Delta y
+    :return: (np.Array) x, Delta x, (np.Array) y, Delta y
 
     :author: Baran Duendar
     """
@@ -63,8 +63,8 @@ def linear_regression(x, y):
     """
     :brief: Linear regression of the given x and y values.
 
-    :param x (np.array/List): X-Values
-    :param y (np.array/List): Y-Values
+    :param x: (np.array/List) X-Values
+    :param y: (np.array/List) Y-Values
 
     :return: (float) Slope, (float) Y-Intercept, (float) Delta Slope, (float) Delta Y-Intercept, (np.array) x-fit, (np.array) y-fit
 
@@ -78,16 +78,33 @@ def linear_regression(x, y):
     print('Delta Slope:', res.stderr)
     print('Intercept:', res.intercept)
     print('Delta Intercept:', res.intercept_stderr)
+
     return x_fit, y_fit, res.slope, res.stderr, res.intercept, res.intercept_stderr
+
+
+def strip_leading_zeros(num):
+    import re
+    """
+    :brief: Removes leading zeros of a given number
+
+    :param num: (float/str) Number with leading zeros
+
+    :return: (int) Number without leading zeros
+
+    :author: Baran Duendar 
+    """
+    if type(num) == int or type(num) == float:
+        num = str(num)
+    return int(re.sub(r'^0*\.0*', '', num))
 
 
 def round_din1333(value: float, uncertainty: float):
     """
     :brief: Takes a value and the corresponding uncertainty and rounds it according to Din 1333 regulations
-    :disclaimer: This function is error subsceptible and the output should always be checked for correctness
+    :disclaimer: This function is error susceptible and the output should always be checked for correctness
 
-    :param value (float): nominal value
-    :param uncertainty (float): uncertainty of nominal value
+    :param value: (float) nominal value
+    :param uncertainty: (float) uncertainty of nominal value
     :return: (float) rounded nominal value, (float) rounded uncertainty
 
     :author: ChatGPT
