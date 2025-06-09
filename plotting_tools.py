@@ -1,6 +1,8 @@
 import pandas as pd
 import numpy as np
 from scipy.stats import linregress
+from scipy.optimize import curve_fit
+from pathlib import Path
 
 
 def read_clipboard():
@@ -40,6 +42,9 @@ def read_csv_file(FilePath):
 
     :author: Baran Duendar
     """
+    if '\\' not in FilePath:
+        FilePath = next((Path.home() / "Desktop").rglob(FilePath), None)
+
     try:
         df = pd.read_csv(FilePath, sep=r'\s+')
         if len(df.columns) == 4:
@@ -80,6 +85,30 @@ def linear_regression(x, y):
     print('Delta Intercept:', res.intercept_stderr)
 
     return x_fit, y_fit, res.slope, res.stderr, res.intercept, res.intercept_stderr
+
+
+def exponential_fit(model, x, y):
+    def exponential_model(x, a, b):
+        if model == 1:
+            return a * np.exp(x * b)
+        elif model == 2:
+            return a * np.exp(-x / b)
+
+    initial_guess = [y[0], x[0]]
+    popt, pcov = curve_fit(exponential_model, x, y, p0=initial_guess)
+
+    a_fit, b_fit = popt
+
+    perr = np.sqrt(np.diag(pcov))
+    a_err, b_err = perr
+
+    print(f"a = {a_fit} $\\pm$ {a_err}")
+    print(f"b = {b_fit} $\\pm$ {b_err}")
+
+    x_fit = np.linspace(min(x), max(x), 300)
+    y_fit = exponential_model(x_fit, a_fit, b_fit)
+
+    return x_fit, y_fit, a_fit, a_err, b_fit, b_err
 
 
 def strip_leading_zeros(num):
