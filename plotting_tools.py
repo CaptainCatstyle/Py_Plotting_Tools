@@ -126,6 +126,12 @@ def strip_leading_zeros(num):
         num = str(num)
     return int(re.sub(r'^0*\.0*', '', num))
 
+def check_for_positive_intercept(intercept):
+    if float(intercept)>=0:
+        return '+'
+    else:
+        return '-'
+
 
 def round_din1333(value: float, uncertainty: float):
     """
