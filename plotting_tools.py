@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from scipy.stats import linregress
 from scipy.optimize import curve_fit
+from scipy.interpolate import interp1d
 from pathlib import Path
 
 
@@ -111,6 +112,28 @@ def exponential_fit(model, x, y):
     return x_fit, y_fit, a_fit, a_err, b_fit, b_err
 
 
+def parabolic_fit(x, y):
+    def parabolic_model(x, a, b, c):
+        return a * x ** 2 + b * x + c
+
+    initial_guess = [x[0], y[0], 0.0]
+    popt, pcov = curve_fit(parabolic_model, x, y, p0=initial_guess)
+
+    a_fit, b_fit, c_fit = popt
+
+    perr = np.sqrt(np.diag(pcov))
+    a_err, b_err, c_err = perr
+
+    print(f"a = {a_fit} $\\pm$ {a_err}")
+    print(f"b = {b_fit} $\\pm$ {b_err}")
+    print(f"b = {c_fit} $\\pm$ {c_err}")
+
+    x_fit = np.linspace(min(x), max(x), 300)
+    y_fit = parabolic_model(x_fit, a_fit, b_fit, c_fit)
+
+    return x_fit, y_fit, a_fit, a_err, b_fit, b_err, c_fit, c_err
+
+
 def strip_leading_zeros(num):
     import re
     """
@@ -132,6 +155,11 @@ def check_for_positive_intercept(intercept):
     else:
         return '-'
 
+def smooth_connect(x, y, kind):
+    x_new = np.linspace(x.min(), x.max(), 500)
+    f = interp1d(x, y, kind=kind)
+    y_smooth = f(x_new)
+    return x_new, y_smooth
 
 def round_din1333(value: float, uncertainty: float):
     """
