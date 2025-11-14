@@ -8,12 +8,17 @@ from pathlib import Path
 
 def read_clipboard():
     """
-    :brief: Reads users clipboard data to get needed plot data
+    :brief: Reads the user clipboard and extracts plot data
 
-    :return: (np.Array) x, Delta x, (np.Array) y, Delta y
+    :return: (tuple) Returns either
+                     (x, xError, y, yError)
+                     or (x, y)
+                     or y
+                     depending on the number of detected columns
 
     :author: Baran Duendar
     """
+
     try:
         df = pd.read_clipboard()
         if len(df.columns) == 4:
@@ -35,14 +40,19 @@ def read_clipboard():
 
 def read_csv_file(FilePath):
     """
-    :brief: Reads csv or txt file to extract plot data
+    :brief: Reads a csv or txt file and extracts plot data
 
-    :param FilePath: (String) Filepath to the Csv or txt file. Recommended is the Input as a raw String
+    :param FilePath: (string) Filepath to the data file. Raw strings are recommended
 
-    :return: (np.Array) x, Delta x, (np.Array) y, Delta y
+    :return: (tuple) Returns either
+                     (x, xError, y, yError)
+                     or (x, y)
+                     or y
+                     depending on the number of detected columns
 
     :author: Baran Duendar
     """
+
     if '\\' not in FilePath:
         FilePath = next((Path.home() / "Desktop").rglob(FilePath), None)
 
@@ -67,12 +77,12 @@ def read_csv_file(FilePath):
 
 def linear_regression(x, y):
     """
-    :brief: Linear regression of the given x and y values.
+    :brief: Performs a linear regression on the given x and y data
 
-    :param x: (np.array/List) X-Values
-    :param y: (np.array/List) Y-Values
+    :param x: (np.array/list) X values
+    :param y: (np.array/list) Y values
 
-    :return: (float) Slope, (float) Y-Intercept, (float) Delta Slope, (float) Delta Y-Intercept, (np.array) x-fit, (np.array) y-fit
+    :return: (tuple) (x_fit, y_fit, slope, delta_slope, intercept, delta_intercept)
 
     :author: Baran Duendar
     """
@@ -89,6 +99,20 @@ def linear_regression(x, y):
 
 
 def exponential_fit(model, x, y):
+    """
+    :brief: Fits an exponential function to the given data
+
+    :param model: (int) Selects the functional form
+                  model 1 -> a * exp(b * x)
+                  model 2 -> a * exp(-x / b)
+    :param x: (list/np.array) Values on the X axis
+    :param y: (list/np.array) Values on the Y axis
+
+    :return: (tuple) (x_fit, y_fit, a_fit, a_err, b_fit, b_err)
+
+    :author: Baran Duendar
+    """
+
     def exponential_model(x, a, b):
         if model == 1:
             return a * np.exp(x * b)
@@ -113,6 +137,17 @@ def exponential_fit(model, x, y):
 
 
 def parabolic_fit(x, y):
+    """
+    :brief: Fits a parabolic function f(x) = a x^2 + b x + c to the given data
+
+    :param x: (list/np.array) Values on the X axis
+    :param y: (list/np.array) Values on the Y axis
+
+    :return: (tuple) (x_fit, y_fit, a_fit, a_err, b_fit, b_err, c_fit, c_err)
+
+    :author: Baran Duendar
+    """
+
     def parabolic_model(x, a, b, c):
         return a * x ** 2 + b * x + c
 
@@ -147,76 +182,121 @@ def strip_leading_zeros(num):
     """
     if type(num) == int or type(num) == float:
         num = str(num)
+
     return int(re.sub(r'^0*\.0*', '', num))
 
+
 def check_for_positive_intercept(intercept):
+    """
+    :brief: Checks the sign of the intercept and returns the correct symbol
+
+    :param intercept: (float or int) Intercept value
+
+    :return: (string) '+' if the intercept is positive otherwise '-'
+
+    :author: Baran Duendar
+    """
+
     if float(intercept)>=0:
         return '+'
     else:
         return '-'
 
+
 def smooth_connect(x, y, kind):
+    """
+    :brief: Creates a smooth connection between data points using interpolation
+
+    :param x: (np.array or list) X values
+    :param y: (np.array or list) Y values
+    :param kind: (string) Interpolation type supported by scipy interp1d
+
+    :return: (tuple) (x_smooth, y_smooth) Interpolated data for smooth plotting
+
+    :author: Baran Duendar
+    """
+
     x_new = np.linspace(x.min(), x.max(), 500)
     f = interp1d(x, y, kind=kind)
     y_smooth = f(x_new)
     return x_new, y_smooth
 
-def round_din1333(value: float, uncertainty: float):
+
+def round_uncertainty(uncertainty):
     """
-    :brief: Takes a value and the corresponding uncertainty and rounds it according to Din 1333 regulations
-    :disclaimer: This function is error susceptible and the output should always be checked for correctness
+    :brief: Takes an uncertainty and rounds it according to DIN 1319-3 regulations
 
-    :param value: (float) nominal value
-    :param uncertainty: (float) uncertainty of nominal value
-    :return: (float) rounded nominal value, (float) rounded uncertainty
+    :param uncertainty: (float/int) uncertainty to be rounded
 
-    :author: ChatGPT
+    :return: (float) rounded uncertainty
+
+    :author: Baran Duendar
     """
-    import math  # local import keeps the function self-contained
 
-    # ---------- local helpers ----------
-    def _round_uncertainty(u: float) -> float:
-        if u == 0:
-            return 0.0
-        sgn = 1 if u > 0 else -1
-        u = abs(u)
+    if uncertainty == 0:
+        return 0.0
 
-        exp10 = math.floor(math.log10(u))
-        lead = u / 10**exp10          # in [1, 10)
-        first = int(lead)
+    uncertainty = np.abs(uncertainty)
+    exp10 = np.floor(np.log10(uncertainty))
+    lead = uncertainty / (10 ** (exp10 - 1))
 
-        if first in (1, 2):           # keep two digits
-            block = int(lead * 10 + 1)  # always upward
-            if block >= 100:          # 19 → 20, etc.
-                block, exp10 = 10, exp10 + 1
-            rounded = block / 10 * 10**exp10
-        else:                         # keep one digit
-            block = first + 1
-            if block == 10:
-                block, exp10 = 1, exp10 + 1
-            rounded = block * 10**exp10
-        return sgn * rounded
+    if lead < 30:
+        sigs = 2
+        rounded = np.ceil(lead) * (10 ** (exp10 - 1))
+    else:
+        sigs = 1
+        rounded = np.ceil(lead / 10) * (10 ** exp10)
 
-    def _half_up(x: float, step: float) -> float:
-        q = x / step
-        return (math.floor(q + 0.5) if q >= 0 else math.ceil(q - 0.5)) * step
+    decimals = int(max(0, -(exp10 - (sigs - 1))))
+    rounded = float(f"{rounded:.{decimals}f}")
 
-    def _step_from_u(u: float) -> float:
-        u = abs(u)
-        exp10 = math.floor(math.log10(u))
-        first = int(u / 10**exp10)
-        sigs = 2 if first in (1, 2) else 1
-        return 10 ** (exp10 - (sigs - 1))
-
-    def _fmt(x: float, step: float) -> str:
-        dec = 0 if step >= 1 else int(round(-math.log10(step)))
-        return f"{x:.{dec}f}"
-
-    # ---------- main algorithm ----------
-    u_r = _round_uncertainty(uncertainty)
-    step = _step_from_u(u_r)
-    v_r = _half_up(value, step)
-    return _fmt(v_r, step), _fmt(u_r, step)
+    return rounded
 
 
+def round_to_digit(value, digit):
+    """
+    :brief: Normal arithmetic rounding (half away from zero) to a configurable digit.
 
+    :param value: (float/int) value to be rounded
+    :param digit: (int) digit to round to
+                digit > 0  -> round to decimals
+                digit = 0  -> round to ones
+                digit < 0  -> round to tens, hundreds, etc.
+
+    :return: (float) rounded value
+
+    :author: Baran Duendar
+    """
+
+    factor = 10 ** digit
+    y = value * factor
+
+    if y >= 0:
+        y = np.floor(y + 0.5)
+    else:
+        y = np.ceil(y - 0.5)
+
+    return y / factor
+
+
+def round_din1333(value, uncertainty):
+    """
+    :brief: Takes a value and its uncertainty and rounds both according to DIN 1333 style rules.
+
+    :param value: (float/int) value
+    :param uncertainty: (float/int) uncertainty of value
+
+    :return: (tuple) (rounded value, rounded uncertainty)
+
+    :author: Baran Duendar
+    """
+
+    uncertainty = round_uncertainty(uncertainty) # round uncertainty
+    if uncertainty == 0:
+        return float(value), 0.0
+
+    exp10 = int(np.floor(np.log10(uncertainty))) # calculate digit to round to
+
+    value = round_to_digit(value, -exp10) # round value
+
+    return float(value), uncertainty
