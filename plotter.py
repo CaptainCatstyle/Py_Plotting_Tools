@@ -32,7 +32,7 @@ slope, std_err_slope = pt.round_din1333(slope, std_err_slope)
 intercept, std_err_intercept = pt.round_din1333(intercept, std_err_intercept)
 std_err_slope = pt.strip_leading_zeros(std_err_slope)
 std_err_intercept = pt.strip_leading_zeros(std_err_intercept)
-ax.plot(x_fit, y_fit, linestyle='-', label=f"fit: y = {slope}({std_err_slope})$\\,$(Unit) {pt.check_for_positive_intercept(intercept)} {np.abs(float(intercept))}({std_err_intercept})$\\,$(Unit)")
+ax.plot(x_fit, y_fit, linestyle='-', label=f"fit: y = {slope}({std_err_slope})$\\,$(Unit) {pt.check_for_positive_intercept(intercept)} {intercept.replace("-", "")}({std_err_intercept})$\\,$(Unit)")
 
 ax.legend(loc='upper left', fancybox=False, edgecolor='black')
 ax.set_xlabel('X-Axis $Size\\,$(Unit)')

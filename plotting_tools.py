@@ -253,7 +253,7 @@ def round_uncertainty(uncertainty):
     return rounded
 
 
-def round_to_digit(value, digit):
+def round_to_digit(value, digit, output_str=False):
     """
     :brief: Normal arithmetic rounding (half away from zero) to a configurable digit.
 
@@ -262,8 +262,9 @@ def round_to_digit(value, digit):
                 digit > 0  -> round to decimals
                 digit = 0  -> round to ones
                 digit < 0  -> round to tens, hundreds, etc.
+    :param: output_str: (boolean) Switch between String or float output
 
-    :return: (float) rounded value
+    :return: (float/string) rounded value
 
     :author: Baran Duendar
     """
@@ -273,10 +274,15 @@ def round_to_digit(value, digit):
 
     if y >= 0:
         y = np.floor(y + 0.5)
+        y_str = str(y / factor) + '0'
     else:
         y = np.ceil(y - 0.5)
+        y_str = str(y / factor) + '0'
 
-    return y / factor
+    if output_str:
+        return y_str
+    else:
+        return y / factor
 
 
 def round_din1333(value, uncertainty):
@@ -297,6 +303,7 @@ def round_din1333(value, uncertainty):
 
     exp10 = int(np.floor(np.log10(uncertainty))) # calculate digit to round to
 
-    value = round_to_digit(value, -exp10) # round value
+    value = round_to_digit(value, -exp10, True) # round value
+    print(value)
 
-    return float(value), uncertainty
+    return value, uncertainty
