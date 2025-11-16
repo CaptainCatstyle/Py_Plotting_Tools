@@ -272,17 +272,23 @@ def round_to_digit(value, digit, output_str=False):
     factor = 10 ** digit
     y = value * factor
 
+    # arithmetic rounding: half away from zero
     if y >= 0:
         y = np.floor(y + 0.5)
-        y_str = str(y / factor) + '0'
     else:
         y = np.ceil(y - 0.5)
-        y_str = str(y / factor) + '0'
+
+    rounded = y / factor
 
     if output_str:
-        return y_str
+        if digit > 0:
+            rounded_str = f"{rounded:.{digit}f}"
+        else:
+            rounded_str = f"{rounded:.0f}"
+
+        return rounded_str
     else:
-        return y / factor
+        return rounded
 
 
 def round_din1333(value, uncertainty):
@@ -303,7 +309,13 @@ def round_din1333(value, uncertainty):
 
     exp10 = int(np.floor(np.log10(uncertainty))) # calculate digit to round to
 
-    value = round_to_digit(value, -exp10, True) # round value
-    print(value)
+    uncertainty_digits = uncertainty / (10 ** exp10)
+    has_one_sig_digit = uncertainty_digits.is_integer()
+    if uncertainty < 1 and not has_one_sig_digit:
+        digit = -exp10 + 1
+    else:
+        digit = -exp10
+
+    value = round_to_digit(value, digit, True) # round value
 
     return value, uncertainty
