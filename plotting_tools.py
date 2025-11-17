@@ -310,7 +310,8 @@ def round_din1333(value, uncertainty):
     exp10 = int(np.floor(np.log10(uncertainty))) # calculate digit to round to
 
     uncertainty_digits = uncertainty / (10 ** exp10)
-    has_one_sig_digit = uncertainty_digits.is_integer()
+    tol = 1e-9
+    has_one_sig_digit = abs(uncertainty_digits - round(uncertainty_digits)) < tol
     if uncertainty < 1 and not has_one_sig_digit:
         digit = -exp10 + 1
     else:
