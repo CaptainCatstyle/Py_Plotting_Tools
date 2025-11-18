@@ -181,9 +181,14 @@ def strip_leading_zeros(num):
     :author: Baran Duendar 
     """
     if type(num) == int or type(num) == float:
-        num = str(num)
+        num_str = str(num)
 
-    return int(re.sub(r'^0*\.0*', '', num))
+    if num < 1:
+        return int(re.sub(r'^0*\.0*', '', num_str))
+    elif num.is_integer():
+        return int(num)
+    else:
+        return num
 
 
 def check_for_positive_intercept(intercept):
@@ -312,7 +317,7 @@ def round_din1333(value, uncertainty):
     uncertainty_digits = uncertainty / (10 ** exp10)
     tol = 1e-9
     has_one_sig_digit = abs(uncertainty_digits - round(uncertainty_digits)) < tol
-    if uncertainty < 1 and not has_one_sig_digit:
+    if uncertainty < 10 and not has_one_sig_digit:
         digit = -exp10 + 1
     else:
         digit = -exp10
