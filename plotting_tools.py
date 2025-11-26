@@ -4,6 +4,7 @@ from scipy.stats import linregress
 from scipy.optimize import curve_fit
 from scipy.interpolate import interp1d
 from pathlib import Path
+from decimal import Decimal
 
 
 def read_clipboard():
@@ -181,7 +182,7 @@ def strip_leading_zeros(num):
     :author: Baran Duendar 
     """
     if type(num) == int or type(num) == float:
-        num_str = str(num)
+        num_str = format(Decimal(str(num)), 'f')
 
     if num < 1:
         return int(re.sub(r'^0*\.0*', '', num_str))
