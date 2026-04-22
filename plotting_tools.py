@@ -76,19 +76,23 @@ def read_csv_file(FilePath):
         print(f"Error reading CSV file: {e}")
 
 
-def linear_regression(x, y):
+def linear_regression(x, y, x_range=[]):
     """
     :brief: Performs a linear regression on the given x and y data
 
     :param x: (np.array/list) X values
-    :param y: (np.array/list) Y values
+    :param y: (np.array/list) Y value
+    :param x_range: (list) X range for x_fit
 
     :return: (tuple) (x_fit, y_fit, slope, delta_slope, intercept, delta_intercept)
 
     :author: Baran Duendar
     """
     res = linregress(x, y)
-    x_fit = np.linspace(min(x), max(x), 100)
+    if len(x_range) == 0:
+        x_fit = np.linspace(min(x), max(x), 100)
+    else:
+        x_fit = np.linspace(x_range[0], x_range[1], 100)
     y_fit = res.slope * x_fit + res.intercept
 
     print('Slope:', res.slope)
