@@ -185,15 +185,19 @@ def strip_leading_zeros(num):
 
     :author: Baran Duendar 
     """
-    if type(num) == int or type(num) == float:
-        num_str = format(Decimal(str(num)), 'f')
 
-    if num < 1:
-        return int(re.sub(r'^0*\.0*', '', num_str))
-    elif num.is_integer():
-        return int(num)
+    if float(num):
+        if type(num) == int or type(num) == float:
+            num_str = format(Decimal(str(num)), 'f')
+
+        if num < 1:
+            return int(re.sub(r'^0*\.0*', '', num_str))
+        elif num.is_integer():
+            return int(num)
+        else:
+            return num
     else:
-        return num
+        return 'ND'
 
 
 def check_for_positive_intercept(intercept):
