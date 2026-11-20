@@ -1,8 +1,8 @@
 import matplotlib.pyplot as plt
 import numpy as np
 import scienceplots
-import plotting_tools as pt
 
+import plotting_tools as pt
 
 plt.style.use(['science', 'notebook', 'grid'])
 

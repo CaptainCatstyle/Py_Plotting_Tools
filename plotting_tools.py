@@ -1,10 +1,11 @@
-import pandas as pd
-import numpy as np
-from scipy.stats import linregress
-from scipy.optimize import curve_fit
-from scipy.interpolate import interp1d
-from pathlib import Path
 from decimal import Decimal
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+from scipy.interpolate import interp1d
+from scipy.optimize import curve_fit
+from scipy.stats import linregress
 
 
 def read_clipboard():
@@ -183,7 +184,7 @@ def strip_leading_zeros(num):
 
     :return: (int) Number without leading zeros
 
-    :author: Baran Duendar 
+    :author: Baran Duendar
     """
 
     if float(num):
